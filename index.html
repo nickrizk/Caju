@@ -1,0 +1,1303 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Uma colecao de cartas virtuais carinhosas para abrir, ler e criar novas mensagens no navegador." />
+  <meta name="theme-color" content="#fffbe8" />
+  <meta property="og:title" content="Cartas guardadas para voce" />
+  <meta property="og:description" content="Abra envelopes virtuais e guarde novas cartas com mensagens especiais." />
+  <meta property="og:type" content="website" />
+  <title>Cartas guardadas para voce</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Lora:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cream: #fffbe8;
+      --linen: #edf8d7;
+      --rose: #b9e7cf;
+      --old-rose: #44b8a6;
+      --wine: #11698e;
+      --plum: #0b4864;
+      --ink: #15343f;
+      --muted: #4d6b6a;
+      --gold: #d7a915;
+      --shadow: 0 20px 70px rgba(11, 72, 100, 0.18);
+      --soft-shadow: 0 14px 34px rgba(17, 105, 142, 0.15);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      text-size-adjust: 100%;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Lora", Georgia, serif;
+      background:
+        radial-gradient(circle at 12% 8%, rgba(255, 222, 89, 0.56), transparent 28rem),
+        radial-gradient(circle at 88% 16%, rgba(85, 190, 166, 0.42), transparent 24rem),
+        radial-gradient(circle at 58% 92%, rgba(82, 165, 219, 0.32), transparent 30rem),
+        linear-gradient(135deg, #fffbe8 0%, #dff4d0 48%, #d8effb 100%);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.45;
+      background-image:
+        linear-gradient(rgba(17, 105, 142, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(70, 170, 138, 0.04) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: linear-gradient(to bottom, black, transparent 85%);
+    }
+
+    .page {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 36px 0 96px;
+    }
+
+    .hero {
+      min-height: 34vh;
+      display: grid;
+      align-items: center;
+      padding: 24px 0 34px;
+    }
+
+    .hero-kicker {
+      color: var(--wine);
+      font-size: 0.86rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-weight: 600;
+      margin: 0 0 12px;
+    }
+
+    h1 {
+      max-width: 780px;
+      margin: 0;
+      color: var(--plum);
+      font-family: "Caveat", cursive;
+      font-size: clamp(3.15rem, 8vw, 6.9rem);
+      line-height: 0.92;
+      letter-spacing: 0;
+    }
+
+    .hero-copy {
+      max-width: 670px;
+      margin: 20px 0 0;
+      color: var(--muted);
+      font-size: clamp(1rem, 1.4vw, 1.18rem);
+      line-height: 1.8;
+    }
+
+    .creator {
+      margin: 30px 0 0;
+      padding: clamp(20px, 4vw, 34px);
+      border: 1px solid rgba(17, 105, 142, 0.18);
+      border-radius: 8px;
+      background: rgba(255, 251, 232, 0.76);
+      box-shadow: var(--soft-shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    .creator-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    .creator-title {
+      margin: 0;
+      color: var(--plum);
+      font-family: "Caveat", cursive;
+      font-size: clamp(2.2rem, 5vw, 3.8rem);
+      line-height: 0.95;
+    }
+
+    .creator-note {
+      margin: 8px 0 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .creator-count {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      min-height: 32px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      color: var(--cream);
+      background: var(--old-rose);
+      font-size: 0.84rem;
+      font-weight: 600;
+    }
+
+    .letter-form {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    .field-wide {
+      grid-column: 1 / -1;
+    }
+
+    .music-help {
+      grid-column: 1 / -1;
+      margin: -4px 0 0;
+      color: var(--muted);
+      font-size: 0.84rem;
+      line-height: 1.55;
+    }
+
+    label {
+      color: var(--plum);
+      font-size: 0.88rem;
+      font-weight: 600;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      border: 1px solid rgba(17, 105, 142, 0.24);
+      border-radius: 8px;
+      padding: 12px 13px;
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.62);
+      font: inherit;
+      outline-color: var(--old-rose);
+    }
+
+    input:focus-visible,
+    textarea:focus-visible,
+    button:focus-visible {
+      outline: 3px solid rgba(215, 169, 21, 0.55);
+      outline-offset: 3px;
+    }
+
+    textarea {
+      min-height: 150px;
+      resize: vertical;
+    }
+
+    .form-actions {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .create-button,
+    .clear-button {
+      border: 0;
+      border-radius: 999px;
+      cursor: pointer;
+      font: inherit;
+      font-weight: 600;
+      transition: transform 180ms ease, background 180ms ease;
+    }
+
+    .create-button {
+      padding: 12px 20px;
+      color: var(--cream);
+      background: var(--wine);
+      box-shadow: 0 12px 24px rgba(17, 105, 142, 0.18);
+    }
+
+    .clear-button {
+      padding: 11px 16px;
+      color: var(--plum);
+      background: rgba(255, 232, 137, 0.72);
+    }
+
+    .create-button:hover,
+    .clear-button:hover {
+      transform: translateY(-1px);
+      background: var(--plum);
+      color: var(--cream);
+    }
+
+    .form-status {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .letter-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 22px;
+      align-items: stretch;
+    }
+
+    .envelope {
+      appearance: none;
+      border: 0;
+      width: 100%;
+      min-height: 210px;
+      padding: 0;
+      cursor: pointer;
+      color: inherit;
+      background: transparent;
+      perspective: 900px;
+      text-align: left;
+    }
+
+    .envelope-shell {
+      position: relative;
+      height: 100%;
+      min-height: 210px;
+      padding: 72px 26px 24px;
+      border: 1px solid rgba(17, 105, 142, 0.16);
+      border-radius: 8px;
+      background:
+        linear-gradient(150deg, transparent 49.7%, rgba(17, 105, 142, 0.13) 50%, transparent 50.6%),
+        linear-gradient(210deg, transparent 49.7%, rgba(68, 184, 166, 0.16) 50%, transparent 50.6%),
+        linear-gradient(180deg, #fff8c8, #dff2e3 54%, #dceffa);
+      box-shadow: var(--soft-shadow);
+      overflow: hidden;
+      transform: translateY(0) rotateX(0);
+      transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+    }
+
+    .envelope-shell::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto;
+      height: 92px;
+      background: linear-gradient(145deg, #ffe889, #bfe7c0 52%, #caeaff);
+      clip-path: polygon(0 0, 50% 86%, 100% 0);
+      border-bottom: 1px solid rgba(17, 105, 142, 0.13);
+      transform-origin: top;
+      transition: transform 260ms ease;
+      z-index: 0;
+    }
+
+    .envelope-shell::after {
+      content: "";
+      position: absolute;
+      width: 54px;
+      height: 54px;
+      left: 50%;
+      top: 63px;
+      transform: translateX(-50%) rotate(45deg);
+      border-radius: 50% 50% 46% 50%;
+      background: linear-gradient(135deg, var(--wine), var(--old-rose));
+      box-shadow: 0 8px 20px rgba(17, 105, 142, 0.22);
+      opacity: 0.95;
+      z-index: 1;
+    }
+
+    .envelope:hover .envelope-shell,
+    .envelope:focus-visible .envelope-shell {
+      transform: translateY(-8px) rotateX(3deg);
+      border-color: rgba(17, 105, 142, 0.34);
+      box-shadow: 0 24px 52px rgba(17, 105, 142, 0.21);
+    }
+
+    .envelope:hover .envelope-shell::before,
+    .envelope:focus-visible .envelope-shell::before {
+      transform: rotateX(18deg);
+    }
+
+    .letter-number,
+    .letter-title,
+    .letter-preview,
+    .music-badge {
+      position: relative;
+      z-index: 2;
+    }
+
+    .letter-number {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      color: var(--cream);
+      background: rgba(17, 105, 142, 0.86);
+      font-size: 0.76rem;
+      font-weight: 600;
+      margin-bottom: 14px;
+    }
+
+    .letter-title {
+      margin: 0;
+      color: var(--plum);
+      font-family: "Caveat", cursive;
+      font-size: clamp(1.95rem, 3vw, 2.55rem);
+      line-height: 0.98;
+    }
+
+    .letter-preview {
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 0.94rem;
+      line-height: 1.55;
+    }
+
+    .music-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 14px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      color: var(--wine);
+      background: rgba(255, 255, 255, 0.58);
+      font-size: 0.76rem;
+      font-weight: 600;
+    }
+
+    .sound-gate {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background:
+        radial-gradient(circle at 20% 15%, rgba(255, 232, 137, 0.72), transparent 24rem),
+        linear-gradient(135deg, rgba(255, 251, 232, 0.97), rgba(216, 239, 251, 0.97));
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 260ms ease, visibility 260ms ease;
+    }
+
+    .sound-gate.is-hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .sound-gate-card {
+      width: min(520px, 100%);
+      padding: clamp(28px, 6vw, 48px);
+      border: 1px solid rgba(17, 105, 142, 0.18);
+      border-radius: 8px;
+      background: rgba(255, 251, 232, 0.9);
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    .sound-gate-title {
+      margin: 0;
+      color: var(--plum);
+      font-family: "Caveat", cursive;
+      font-size: clamp(2.7rem, 8vw, 4.8rem);
+      line-height: 0.95;
+    }
+
+    .sound-gate-copy {
+      margin: 16px auto 22px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .sound-gate-button {
+      border: 0;
+      border-radius: 999px;
+      padding: 13px 24px;
+      cursor: pointer;
+      color: var(--cream);
+      background: var(--wine);
+      box-shadow: 0 12px 24px rgba(17, 105, 142, 0.18);
+      font: inherit;
+      font-weight: 600;
+      transition: transform 180ms ease, background 180ms ease;
+    }
+
+    .sound-gate-button:hover {
+      transform: translateY(-1px);
+      background: var(--plum);
+    }
+
+    .sound-gate-status {
+      min-height: 1.3em;
+      margin: 14px 0 0;
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+
+    .audio-player {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border: 1px solid rgba(17, 105, 142, 0.18);
+      border-radius: 999px;
+      background: rgba(255, 251, 232, 0.88);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 12px 36px rgba(11, 72, 100, 0.16);
+    }
+
+    .audio-button,
+    .close-button {
+      border: 0;
+      cursor: pointer;
+      color: var(--cream);
+      background: var(--wine);
+      font: inherit;
+      transition: transform 180ms ease, background 180ms ease;
+    }
+
+    .audio-button:hover,
+    .close-button:hover {
+      transform: translateY(-1px);
+      background: var(--plum);
+    }
+
+    .audio-button {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 1.05rem;
+    }
+
+    .audio-label {
+      color: var(--plum);
+      font-size: 0.88rem;
+      white-space: nowrap;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: rgba(8, 62, 83, 0.42);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 220ms ease;
+    }
+
+    .modal.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .letter-dialog {
+      width: min(780px, 100%);
+      max-height: min(760px, calc(100vh - 40px));
+      overflow: auto;
+      position: relative;
+      border-radius: 8px;
+      border: 1px solid rgba(17, 105, 142, 0.16);
+      background:
+        linear-gradient(rgba(255, 251, 232, 0.9), rgba(255, 251, 232, 0.9)),
+        repeating-linear-gradient(0deg, transparent 0 31px, rgba(68, 184, 166, 0.17) 32px);
+      box-shadow: var(--shadow);
+      padding: clamp(24px, 5vw, 52px);
+      transform: translateY(18px) scale(0.98);
+      transition: transform 260ms ease;
+    }
+
+    .modal.is-open .letter-dialog {
+      transform: translateY(0) scale(1);
+    }
+
+    .close-button {
+      position: sticky;
+      top: 0;
+      float: right;
+      padding: 10px 16px;
+      border-radius: 999px;
+      margin: -20px -20px 12px 16px;
+      box-shadow: 0 10px 22px rgba(17, 105, 142, 0.18);
+    }
+
+    .modal-kicker {
+      margin: 4px 0 8px;
+      color: var(--gold);
+      font-weight: 600;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      font-size: 0.78rem;
+    }
+
+    .modal-title {
+      margin: 0 0 20px;
+      color: var(--wine);
+      font-family: "Caveat", cursive;
+      font-size: clamp(2.5rem, 7vw, 4.8rem);
+      line-height: 0.95;
+      letter-spacing: 0;
+    }
+
+    .letter-photo {
+      width: 100%;
+      max-height: 320px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 8px solid rgba(255, 251, 232, 0.88);
+      box-shadow: 0 16px 40px rgba(11, 72, 100, 0.15);
+      margin: 4px 0 24px;
+      background: var(--linen);
+    }
+
+    .letter-music {
+      clear: both;
+      margin: 4px 0 26px;
+      padding: 16px;
+      border: 1px solid rgba(17, 105, 142, 0.16);
+      border-radius: 8px;
+      background: rgba(223, 242, 227, 0.72);
+    }
+
+    .letter-music-label {
+      margin: 0 0 10px;
+      color: var(--plum);
+      font-size: 0.86rem;
+      font-weight: 600;
+    }
+
+    .letter-audio {
+      display: block;
+      width: 100%;
+    }
+
+    .youtube-player {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      border-radius: 8px;
+      background: var(--plum);
+    }
+
+    .youtube-player iframe {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    .letter-body {
+      clear: both;
+      color: var(--ink);
+      font-size: clamp(1rem, 1.65vw, 1.14rem);
+      line-height: 1.92;
+    }
+
+    .letter-body p {
+      margin: 0 0 18px;
+    }
+
+    .signature {
+      margin-top: 28px;
+      color: var(--wine);
+      font-family: "Caveat", cursive;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      line-height: 1;
+    }
+
+    @media (max-width: 900px) {
+      .letter-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 620px) {
+      .page {
+        width: min(100% - 22px, 520px);
+        padding-top: 22px;
+        padding-bottom: 112px;
+      }
+
+      .hero {
+        min-height: auto;
+        padding: 26px 0 28px;
+      }
+
+      .letter-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .creator-header,
+      .letter-form {
+        grid-template-columns: 1fr;
+      }
+
+      .creator-header {
+        display: grid;
+        align-items: start;
+      }
+
+      .envelope,
+      .envelope-shell {
+        min-height: 190px;
+      }
+
+      .audio-player {
+        left: 12px;
+        right: 12px;
+        bottom: 12px;
+        justify-content: center;
+      }
+
+      .audio-label {
+        white-space: normal;
+      }
+
+      .modal {
+        padding: 10px;
+        place-items: end center;
+      }
+
+      .letter-dialog {
+        max-height: calc(100vh - 20px);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="sound-gate" id="soundGate" role="dialog" aria-modal="true" aria-labelledby="soundGateTitle">
+    <div class="sound-gate-card">
+      <h2 class="sound-gate-title" id="soundGateTitle">Cartas guardadas para voce</h2>
+      <p class="sound-gate-copy">Abra esta pequena colecao com a musica preparada para acompanhar cada palavra.</p>
+      <button class="sound-gate-button" id="enterSite" type="button">Abrir as cartas</button>
+      <p class="sound-gate-status" id="soundGateStatus" aria-live="polite">A musica comeca ao abrir.</p>
+    </div>
+  </div>
+
+  <main class="page">
+    <section class="hero" aria-labelledby="page-title">
+      <div>
+        <p class="hero-kicker">Algumas palavras guardadas para voce...</p>
+        <h1 id="page-title" tabindex="-1">Uma pequena colecao de cartas para lembrar o quanto voce importa.</h1>
+        <p class="hero-copy">
+          Escolha um envelope, abra devagar e encontre uma mensagem feita para ficar pertinho, mesmo nos dias em que a distancia tenta falar mais alto.
+        </p>
+      </div>
+    </section>
+
+    <section class="letter-grid" id="letterGrid" aria-label="Cartas virtuais"></section>
+
+    <section class="creator" aria-labelledby="creatorTitle">
+      <div class="creator-header">
+        <div>
+          <h2 class="creator-title" id="creatorTitle">Crie uma nova carta</h2>
+          <p class="creator-note">Escreva um titulo, uma previa e a mensagem. Ela aparece como um novo envelope e fica salva neste navegador.</p>
+        </div>
+        <span class="creator-count" id="customCount">0 criadas</span>
+      </div>
+
+      <form class="letter-form" id="letterForm">
+        <div class="field">
+          <label for="letterTitleInput">Titulo da carta</label>
+          <input id="letterTitleInput" name="title" type="text" maxlength="70" placeholder="Ex: Leia quando sentir saudade" required>
+        </div>
+
+        <div class="field">
+          <label for="letterPreviewInput">Frase do envelope</label>
+          <input id="letterPreviewInput" name="preview" type="text" maxlength="120" placeholder="Uma pequena chamada para abrir o coracao" required>
+        </div>
+
+        <div class="field field-wide">
+          <label for="letterPhotoInput">Foto (opcional)</label>
+          <input id="letterPhotoInput" name="photo" type="text" autocomplete="off" placeholder="Cole uma URL https://... ou ./imagens/foto.jpg">
+        </div>
+
+        <div class="field">
+          <label for="letterMusicFileInput">Musica em MP3 (opcional)</label>
+          <input id="letterMusicFileInput" name="musicFile" type="file" accept=".mp3,audio/mpeg">
+        </div>
+
+        <div class="field">
+          <label for="letterYoutubeInput">Link do YouTube (opcional)</label>
+          <input id="letterYoutubeInput" name="youtube" type="url" inputmode="url" autocomplete="off" placeholder="https://youtu.be/...">
+        </div>
+
+        <p class="music-help">Escolha apenas uma opcao. O MP3 fica salvo neste navegador; o YouTube precisa de internet para tocar.</p>
+
+        <div class="field field-wide">
+          <label for="letterBodyInput">Texto da carta</label>
+          <textarea id="letterBodyInput" name="body" placeholder="Escreva aqui sua mensagem..." required></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button class="create-button" type="submit">Guardar carta</button>
+          <button class="clear-button" id="deleteLastLetter" type="button">Apagar ultima carta</button>
+          <span class="form-status" id="formStatus" aria-live="polite"></span>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <aside class="audio-player" aria-label="Musica de fundo">
+    <button class="audio-button" id="audioToggle" type="button" aria-label="Tocar musica">♪</button>
+    <span class="audio-label" id="audioStatus">toque para ativar</span>
+    <audio id="bgMusic" loop autoplay preload="auto">
+      <source src="nossa-musica.mp3" type="audio/mpeg">
+    </audio>
+  </aside>
+
+  <div class="modal" id="letterModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalBody" hidden>
+    <article class="letter-dialog">
+      <button class="close-button" id="closeModal" type="button" aria-label="Fechar carta">Fechar carta</button>
+      <p class="modal-kicker" id="modalKicker"></p>
+      <h2 class="modal-title" id="modalTitle"></h2>
+      <img class="letter-photo" id="modalPhoto" alt="" hidden>
+      <div class="letter-music" id="modalMusic" hidden>
+        <p class="letter-music-label" id="modalMusicLabel">Musica desta carta</p>
+        <audio class="letter-audio" id="letterAudio" controls preload="metadata" hidden></audio>
+        <div class="youtube-player" id="youtubePlayer" hidden></div>
+      </div>
+      <div class="letter-body" id="modalBody"></div>
+      <div class="signature">Com todo meu carinho.</div>
+    </article>
+  </div>
+
+  <noscript>Ative o JavaScript para abrir as cartas e criar novas mensagens.</noscript>
+
+  <script>
+    const letters = [];
+
+    const STORAGE_KEY = "cartas-virtuais-criadas";
+    const MUSIC_DB_NAME = "cartas-virtuais-musicas";
+    const MUSIC_STORE_NAME = "mp3";
+    const grid = document.getElementById("letterGrid");
+    const letterForm = document.getElementById("letterForm");
+    const letterTitleInput = document.getElementById("letterTitleInput");
+    const letterPreviewInput = document.getElementById("letterPreviewInput");
+    const letterPhotoInput = document.getElementById("letterPhotoInput");
+    const letterMusicFileInput = document.getElementById("letterMusicFileInput");
+    const letterYoutubeInput = document.getElementById("letterYoutubeInput");
+    const letterBodyInput = document.getElementById("letterBodyInput");
+    const deleteLastLetter = document.getElementById("deleteLastLetter");
+    const formStatus = document.getElementById("formStatus");
+    const customCount = document.getElementById("customCount");
+    const modal = document.getElementById("letterModal");
+    const modalKicker = document.getElementById("modalKicker");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalBody = document.getElementById("modalBody");
+    const modalPhoto = document.getElementById("modalPhoto");
+    const modalMusic = document.getElementById("modalMusic");
+    const modalMusicLabel = document.getElementById("modalMusicLabel");
+    const letterAudio = document.getElementById("letterAudio");
+    const youtubePlayer = document.getElementById("youtubePlayer");
+    const closeModal = document.getElementById("closeModal");
+    const audio = document.getElementById("bgMusic");
+    const audioToggle = document.getElementById("audioToggle");
+    const audioStatus = document.getElementById("audioStatus");
+    const soundGate = document.getElementById("soundGate");
+    const soundGateStatus = document.getElementById("soundGateStatus");
+    const enterSite = document.getElementById("enterSite");
+    const pageTitle = document.getElementById("page-title");
+    let lastFocusedEnvelope = null;
+    let isMusicPlaying = false;
+    let activeLetterMusicUrl = null;
+    let openedLetterSequence = 0;
+    let createdLetters = loadCreatedLetters();
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function getAllLetters() {
+      return [...letters, ...createdLetters];
+    }
+
+    function normalizeMusic(music) {
+      if (!music || typeof music !== "object") return null;
+
+      if (music.type === "youtube" && /^[A-Za-z0-9_-]{11}$/.test(music.videoId || "")) {
+        return { type: "youtube", videoId: music.videoId };
+      }
+
+      if (music.type === "mp3" && typeof music.id === "string" && music.id) {
+        return {
+          type: "mp3",
+          id: music.id,
+          name: typeof music.name === "string" ? music.name : "Musica da carta"
+        };
+      }
+
+      return null;
+    }
+
+    function loadCreatedLetters() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+        if (!Array.isArray(saved)) return [];
+        return saved
+          .filter(letter =>
+            letter &&
+            typeof letter.title === "string" &&
+            typeof letter.preview === "string" &&
+            Array.isArray(letter.paragraphs)
+          )
+          .map((letter, index) => ({
+            title: letter.title,
+            preview: letter.preview,
+            photo: typeof letter.photo === "string" ? letter.photo : "",
+            music: normalizeMusic(letter.music),
+            label: typeof letter.label === "string" ? letter.label : `Criada #${index + 1}`,
+            paragraphs: letter.paragraphs.map(String)
+          }));
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function saveCreatedLetters() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(createdLetters));
+        return true;
+      } catch (error) {
+        return false;
+      }
+    }
+
+    function updateCreatedCount() {
+      const total = createdLetters.length;
+      customCount.textContent = total === 1 ? "1 criada" : `${total} criadas`;
+    }
+
+    function updateAudioUi(isPlaying, message) {
+      isMusicPlaying = isPlaying;
+      audioToggle.textContent = isPlaying ? "❚❚" : "♪";
+      audioToggle.setAttribute("aria-label", isPlaying ? "Pausar musica" : "Tocar musica");
+      audioStatus.textContent = message;
+    }
+
+    function hideSoundGate(moveFocus = false) {
+      soundGate.classList.add("is-hidden");
+      soundGate.setAttribute("aria-hidden", "true");
+      if (moveFocus) {
+        pageTitle.focus({ preventScroll: true });
+      }
+    }
+
+    async function playBackgroundMusic() {
+      try {
+        audio.loop = true;
+        await audio.play();
+        updateAudioUi(true, "tocando continuamente");
+        hideSoundGate();
+        return true;
+      } catch (error) {
+        updateAudioUi(false, "toque para ativar a musica");
+        return false;
+      }
+    }
+
+    function openMusicDatabase() {
+      return new Promise((resolve, reject) => {
+        if (!window.indexedDB) {
+          reject(new Error("Armazenamento de arquivos nao suportado."));
+          return;
+        }
+
+        const request = indexedDB.open(MUSIC_DB_NAME, 1);
+
+        request.onupgradeneeded = () => {
+          const database = request.result;
+          if (!database.objectStoreNames.contains(MUSIC_STORE_NAME)) {
+            database.createObjectStore(MUSIC_STORE_NAME, { keyPath: "id" });
+          }
+        };
+
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error || new Error("Nao foi possivel abrir o armazenamento de musicas."));
+      });
+    }
+
+    function createMusicId() {
+      if (window.crypto && typeof window.crypto.randomUUID === "function") {
+        return window.crypto.randomUUID();
+      }
+      return `musica-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    }
+
+    async function saveMusicFile(file) {
+      const database = await openMusicDatabase();
+      const music = {
+        id: createMusicId(),
+        name: file.name,
+        type: file.type || "audio/mpeg",
+        file
+      };
+
+      await new Promise((resolve, reject) => {
+        const transaction = database.transaction(MUSIC_STORE_NAME, "readwrite");
+        transaction.objectStore(MUSIC_STORE_NAME).put(music);
+        transaction.oncomplete = resolve;
+        transaction.onerror = () => reject(transaction.error || new Error("Nao foi possivel salvar o MP3."));
+        transaction.onabort = () => reject(transaction.error || new Error("O salvamento do MP3 foi interrompido."));
+      });
+
+      database.close();
+      return { type: "mp3", id: music.id, name: music.name };
+    }
+
+    async function getMusicFile(id) {
+      const database = await openMusicDatabase();
+      const music = await new Promise((resolve, reject) => {
+        const request = database.transaction(MUSIC_STORE_NAME, "readonly")
+          .objectStore(MUSIC_STORE_NAME)
+          .get(id);
+        request.onsuccess = () => resolve(request.result || null);
+        request.onerror = () => reject(request.error || new Error("Nao foi possivel carregar o MP3."));
+      });
+      database.close();
+      return music ? music.file : null;
+    }
+
+    async function deleteMusicFile(id) {
+      const database = await openMusicDatabase();
+      await new Promise((resolve, reject) => {
+        const transaction = database.transaction(MUSIC_STORE_NAME, "readwrite");
+        transaction.objectStore(MUSIC_STORE_NAME).delete(id);
+        transaction.oncomplete = resolve;
+        transaction.onerror = () => reject(transaction.error || new Error("Nao foi possivel apagar o MP3."));
+      });
+      database.close();
+    }
+
+    function extractYouTubeId(value) {
+      const trimmedValue = value.trim();
+      if (/^[A-Za-z0-9_-]{11}$/.test(trimmedValue)) return trimmedValue;
+
+      try {
+        const url = new URL(trimmedValue);
+        const host = url.hostname.toLowerCase().replace(/^www\./, "");
+
+        if (host === "youtu.be") {
+          const id = url.pathname.split("/").filter(Boolean)[0];
+          return /^[A-Za-z0-9_-]{11}$/.test(id || "") ? id : null;
+        }
+
+        if (host === "youtube.com" || host === "m.youtube.com" || host === "music.youtube.com") {
+          const pathParts = url.pathname.split("/").filter(Boolean);
+          const id = url.searchParams.get("v") ||
+            (["shorts", "embed", "live"].includes(pathParts[0]) ? pathParts[1] : null);
+          return /^[A-Za-z0-9_-]{11}$/.test(id || "") ? id : null;
+        }
+      } catch (error) {
+        return null;
+      }
+
+      return null;
+    }
+
+    function pauseBackgroundMusic() {
+      audio.pause();
+      updateAudioUi(false, "musica pausada");
+    }
+
+    function clearLetterMusic() {
+      letterAudio.pause();
+      letterAudio.removeAttribute("src");
+      letterAudio.hidden = true;
+      youtubePlayer.replaceChildren();
+      youtubePlayer.hidden = true;
+      modalMusic.hidden = true;
+      modalMusicLabel.textContent = "Musica desta carta";
+
+      if (activeLetterMusicUrl) {
+        URL.revokeObjectURL(activeLetterMusicUrl);
+        activeLetterMusicUrl = null;
+      }
+    }
+
+    async function showLetterMusic(music, sequence) {
+      clearLetterMusic();
+      if (!music) return;
+
+      if (isMusicPlaying) {
+        pauseBackgroundMusic();
+      }
+
+      modalMusic.hidden = false;
+
+      if (music.type === "youtube") {
+        const iframe = document.createElement("iframe");
+        iframe.src = `https://www.youtube-nocookie.com/embed/${music.videoId}?autoplay=1&rel=0`;
+        iframe.title = "Musica desta carta no YouTube";
+        iframe.allow = "autoplay; encrypted-media; picture-in-picture; web-share";
+        iframe.referrerPolicy = "strict-origin-when-cross-origin";
+        iframe.allowFullscreen = true;
+        youtubePlayer.replaceChildren(iframe);
+        youtubePlayer.hidden = false;
+        return;
+      }
+
+      modalMusicLabel.textContent = `Musica desta carta: ${music.name}`;
+
+      try {
+        const file = await getMusicFile(music.id);
+        if (sequence !== openedLetterSequence || !modal.classList.contains("is-open")) return;
+
+        if (!file) {
+          modalMusicLabel.textContent = "O MP3 desta carta nao esta disponivel neste navegador.";
+          return;
+        }
+
+        activeLetterMusicUrl = URL.createObjectURL(file);
+        letterAudio.src = activeLetterMusicUrl;
+        letterAudio.hidden = false;
+        try {
+          await letterAudio.play();
+        } catch (error) {
+          // O navegador pode exigir que a pessoa pressione o botao de reproduzir.
+        }
+      } catch (error) {
+        modalMusicLabel.textContent = "Nao foi possivel carregar o MP3 desta carta.";
+      }
+    }
+
+    function renderLetters() {
+      const allLetters = getAllLetters();
+      grid.innerHTML = allLetters.map((letter, index) => `
+        <button class="envelope" type="button" data-index="${index}" aria-label="Abrir ${escapeHtml(letter.title)}">
+          <div class="envelope-shell">
+            <span class="letter-number">${escapeHtml(letter.label)}</span>
+            <h2 class="letter-title">${escapeHtml(letter.title)}</h2>
+            <p class="letter-preview">${escapeHtml(letter.preview)}</p>
+            ${letter.music ? '<span class="music-badge">♪ Musica incluida</span>' : ''}
+          </div>
+        </button>
+      `).join("");
+      updateCreatedCount();
+    }
+
+    async function openLetter(index, trigger) {
+      const letter = getAllLetters()[index];
+      const sequence = ++openedLetterSequence;
+      lastFocusedEnvelope = trigger;
+      modalKicker.textContent = letter.label;
+      modalTitle.textContent = letter.title;
+      modalBody.innerHTML = letter.paragraphs.map(paragraph => `<p>${escapeHtml(paragraph)}</p>`).join("");
+
+      if (letter.photo) {
+        modalPhoto.src = letter.photo;
+        modalPhoto.alt = `Foto especial da carta: ${letter.title}`;
+        modalPhoto.hidden = false;
+      } else {
+        modalPhoto.removeAttribute("src");
+        modalPhoto.alt = "";
+        modalPhoto.hidden = true;
+      }
+
+      modal.hidden = false;
+      modal.classList.add("is-open");
+      document.body.style.overflow = "hidden";
+      closeModal.focus();
+      await showLetterMusic(letter.music, sequence);
+    }
+
+    function closeLetter() {
+      openedLetterSequence += 1;
+      clearLetterMusic();
+      modal.classList.remove("is-open");
+      modal.hidden = true;
+      document.body.style.overflow = "";
+      if (lastFocusedEnvelope) {
+        lastFocusedEnvelope.focus();
+      }
+    }
+
+    grid.addEventListener("click", event => {
+      const envelope = event.target.closest(".envelope");
+      if (!envelope) return;
+      openLetter(Number(envelope.dataset.index), envelope);
+    });
+
+    letterMusicFileInput.addEventListener("change", () => {
+      if (letterMusicFileInput.files.length) {
+        letterYoutubeInput.value = "";
+      }
+    });
+
+    letterYoutubeInput.addEventListener("input", () => {
+      if (letterYoutubeInput.value.trim()) {
+        letterMusicFileInput.value = "";
+      }
+    });
+
+    letterForm.addEventListener("submit", async event => {
+      event.preventDefault();
+      const title = letterTitleInput.value.trim();
+      const preview = letterPreviewInput.value.trim();
+      const photo = letterPhotoInput.value.trim();
+      const body = letterBodyInput.value.trim();
+      const musicFile = letterMusicFileInput.files[0] || null;
+      const youtubeValue = letterYoutubeInput.value.trim();
+
+      if (!title || !preview || !body) {
+        formStatus.textContent = "Preencha titulo, frase e texto.";
+        return;
+      }
+
+      if (musicFile && youtubeValue) {
+        formStatus.textContent = "Escolha somente um MP3 ou um link do YouTube.";
+        return;
+      }
+
+      let music = null;
+
+      if (youtubeValue) {
+        const videoId = extractYouTubeId(youtubeValue);
+        if (!videoId) {
+          formStatus.textContent = "Cole um link valido de um video do YouTube.";
+          return;
+        }
+        music = { type: "youtube", videoId };
+      }
+
+      if (musicFile) {
+        const isMp3 = musicFile.type === "audio/mpeg" || /\.mp3$/i.test(musicFile.name);
+        if (!isMp3) {
+          formStatus.textContent = "Escolha um arquivo no formato MP3.";
+          return;
+        }
+
+        formStatus.textContent = "Guardando o MP3...";
+        try {
+          music = await saveMusicFile(musicFile);
+        } catch (error) {
+          formStatus.textContent = "Nao foi possivel salvar esse MP3 neste navegador.";
+          return;
+        }
+      }
+
+      const paragraphs = body
+        .split(/\n{2,}/)
+        .map(paragraph => paragraph.trim())
+        .filter(Boolean);
+
+      createdLetters.push({
+        title,
+        preview,
+        photo,
+        music,
+        label: `Criada #${createdLetters.length + 1}`,
+        paragraphs
+      });
+
+      const wasSaved = saveCreatedLetters();
+      renderLetters();
+      letterForm.reset();
+      formStatus.textContent = wasSaved
+        ? "Carta guardada com carinho."
+        : "Carta criada nesta sessao, mas o navegador nao permitiu salvar.";
+      grid.lastElementChild.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+
+    deleteLastLetter.addEventListener("click", async () => {
+      if (!createdLetters.length) {
+        formStatus.textContent = "Nao ha uma carta criada para apagar.";
+        return;
+      }
+
+      const removedLetter = createdLetters.pop();
+      const wasSaved = saveCreatedLetters();
+
+      if (removedLetter.music && removedLetter.music.type === "mp3") {
+        try {
+          await deleteMusicFile(removedLetter.music.id);
+        } catch (error) {
+          // A carta continua removida mesmo se o navegador nao liberar o arquivo imediatamente.
+        }
+      }
+
+      renderLetters();
+      formStatus.textContent = wasSaved
+        ? `A carta "${removedLetter.title}" foi apagada.`
+        : "A ultima carta foi apagada nesta sessao, mas o navegador nao permitiu atualizar o salvamento.";
+    });
+
+    closeModal.addEventListener("click", closeLetter);
+
+    modal.addEventListener("click", event => {
+      if (event.target === modal) {
+        closeLetter();
+      }
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape" && modal.classList.contains("is-open")) {
+        closeLetter();
+      }
+    });
+
+    audioToggle.addEventListener("click", async () => {
+      if (isMusicPlaying) {
+        pauseBackgroundMusic();
+      } else {
+        await playBackgroundMusic();
+      }
+    });
+
+    enterSite.addEventListener("click", async () => {
+      soundGateStatus.textContent = "Iniciando a musica...";
+      const started = await playBackgroundMusic();
+      if (!started) {
+        soundGateStatus.textContent = "Nao foi possivel iniciar a musica, mas voce pode usar o botao de som.";
+      }
+      hideSoundGate(true);
+    });
+
+    ["pointerdown", "keydown"].forEach(eventName => {
+      document.addEventListener(eventName, event => {
+        if (event.target instanceof Element && event.target.closest(".audio-player, .sound-gate")) {
+          return;
+        }
+        if (!isMusicPlaying) {
+          playBackgroundMusic();
+        }
+      }, { once: true });
+    });
+
+    renderLetters();
+
+    window.addEventListener("load", () => {
+      playBackgroundMusic();
+    }, { once: true });
+  </script>
+</body>
+</html>
